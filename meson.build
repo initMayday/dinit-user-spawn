@@ -6,5 +6,5 @@ executable(
   include_directories: include_directories('.'),
   dependencies: [dependency('pam')],
   cpp_args: [],
-  install: false,
+  install: true,
 )

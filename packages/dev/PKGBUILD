@@ -4,7 +4,7 @@
 _pkgname="dinit-user-spawn"
 pkgname="$_pkgname-dev-git"
 pkgrel=1
-pkgver=r.
+pkgver=r3.c03b0eb
 pkgdesc='Launches a user process dinit for you on login'
 arch=('any')
 url='https://github.com/initMayday/dinit-user-spawn.git'
@@ -31,4 +31,6 @@ build() {
 package() {
     cd "$_pkgname"
     meson install -C "$builddir" --destdir="$pkgdir"
+    cd "$startdir"
+    rm -rf "$_pkgname"
 }
