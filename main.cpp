@@ -102,6 +102,10 @@ std::optional<int> get_int_from_name(std::string name) {
 }
 
 int main() {
+    if (geteuid() != 0) {
+        std::cerr << "[ERROR] Program must be ran with root privileges!" << std::endl;
+        exit(EXIT_FAILURE);
+    }
     
     // Incase we are started after some users have already logged in (should not occur in normal scenarios)
     std::vector<int> queued_users;
