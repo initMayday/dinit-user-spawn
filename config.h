@@ -1,3 +1,5 @@
+// Copyright (C) 2025 initMayday. This is available under GPLv3-or-later. See LICENSE.md
+
 #pragma once
 #include <optional>
 #include <string>

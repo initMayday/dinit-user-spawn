@@ -1,3 +1,5 @@
+// Copyright (C) 2025 initMayday. This is available under GPLv3-or-later. See LICENSE.md
+
 #include <cstdlib>
 #include <cstring>
 #include <filesystem>
