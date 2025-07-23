@@ -4,7 +4,7 @@
 _pkgname="dinit-user-spawn"
 pkgname="$_pkgname-dev-git"
 pkgrel=1
-pkgver=r8.bfaa26b
+pkgver=r9.fcdca67
 pkgdesc='Launches a user process dinit for you on login'
 arch=('any')
 url='https://github.com/initMayday/dinit-user-spawn.git'
@@ -13,7 +13,7 @@ depends=('tomlplusplus')
 provides=("$_pkgname")
 conflicts=("$_pkgname")
 license=('AGPL-3.0-or-later')
-source=("$_pkgname::git+$url")
+source=("$_pkgname::git+$url#branch=dev")
 sha256sums=('SKIP')
 builddir='build-release'
 
