@@ -1,13 +1,22 @@
-dinit-user-spawn
+# dinit-user-spawn
 
-Dinit-user-spawn is a program which runs a dinit process, under each user that logs in (and removes it when they log out).
-This means that users have a dinit instance to manage their own user dinit services, automatically.
-The program checks whether a new user has logged in, by checking for a new file within /run/user/. On startup, it will spawn a dinit instance for each of these users, and then if any more are added to that folder.
-Users who are logged out are removed from /run/user, and the program sees this and sends a kill to that dinit process, of which is then handled.
+Dinit-user-spawn spawns a dinit process for each user that logs onto the system, automagically. This is useful by, for example, allowing each user to run their own pipewire processes under their own user.
 
-Find all configuration options within config.h, where there is an example toml demonstrating everything (within a raw string).
+Upon user logout, the user dinit process is cleaned up. This is the entire scope of the program.
 
-Please report any issues under the github issues. If there are any feature requests, you can also post them there, however, the scope of this program is limited to what is mentioned above.
+## The logic behind the program
+The program finds logged-in users by monitoring /run/user/, where a directory (with the name of the user's UID), will be created when they log in. For example, for most people, when they log onto their main account a new folder "1000" (their user's UID), will be created in /run/user/.
 
-Copyright (C) 2025 initMayday
-This program is available under AGPL-v3-or-later. See LICENSE.md for further information.
+For each of these users, dinit-user-spawn creates a new dinit process that is ran under that user. The dinit process PID is kept in a dictionary, with the user's UID as the key.
+
+Upon user logout, dinit-user-spawn kills the associated dinit process (by looking it up in the dictionary), and then handles the cleanup.
+
+## Configuration
+Find all configuration options within config.h, where there is an example toml demonstrating everything. It is called example_toml.
+
+## Misc
+Please report any issues under the github issues. If there are any feature requests, you can also post them there, however, the scope of this program is limited to what is mentioned above. Alternatively, I can often be found on the artix telegram, so feel free to ask there.
+
+Copyright (C) 2025 initMayday (initMayday@protonmail.com)
+
+AGPL-v3-or-later Licensed
