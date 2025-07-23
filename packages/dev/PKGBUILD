@@ -9,7 +9,7 @@ pkgdesc='Launches a user process dinit for you on login'
 arch=('any')
 url='https://github.com/initMayday/dinit-user-spawn.git'
 makedepends=()
-depends=()
+depends=('tomlplusplus')
 provides=("$_pkgname")
 conflicts=("$_pkgname")
 license=('AGPL-3.0-or-later')
@@ -33,4 +33,7 @@ package() {
     meson install -C "$builddir" --destdir="$pkgdir"
     cd "$startdir"
     rm -rf "$_pkgname"
+
+    mkdir -p "$pkgdir/lib/dinit.d/"
+    cp -f dinit-user-spawn.service "$pkgdir/lib/dinit.d/dinit-user-spawn"
 }

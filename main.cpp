@@ -14,8 +14,15 @@
 #include <sys/wait.h>
 #include <csignal>
 
+#include "config.h"
+
 const std::filesystem::path monitored_path = "/run/user";
 std::map<int, int> uid_pid_map;
+
+std::string get_env_var(const std::string& var) {
+    const char* val = std::getenv(var.c_str());
+    return val ? std::string(val) : std::string{};
+}
 
 // MUST RUN AS ROOT, GETS ENV VARS FOR SPECIFIED USER
 std::unordered_map<std::string, std::string> get_env_vars(passwd* pw) {
@@ -23,7 +30,7 @@ std::unordered_map<std::string, std::string> get_env_vars(passwd* pw) {
     env_vars.insert({"XDG_RUNTIME_DIR", std::string("/run/user/" + std::to_string(pw->pw_uid))}); // Arbitrary env var we need
 
     std::string command = "su - " + std::string(pw->pw_name) + " -c 'env'";
-    std::cout << "COMMAND: " << command << std::endl;
+    //std::cout << "COMMAND: " << command << std::endl;
     std::array<char, 4096> buffer;
     std::string result;
 
@@ -128,6 +135,8 @@ void handle_user(int uid) {
         exit(EXIT_FAILURE);
     }
 
+    std::cout << process_id << " [LOG] Running as: " << getpwuid(getuid())->pw_name << std::endl;
+
     // Set new environment
     for (const auto& pair: env_vars) {
         setenv(pair.first.c_str(), pair.second.c_str(), 0); // Don't overwrite existing env vars
@@ -135,13 +144,33 @@ void handle_user(int uid) {
 
     //system("env"); // Prints current environment vars
 
-    std::cout << process_id << " [LOG] Running as: " << getpwuid(getuid())->pw_name << std::endl;
+    std::string home = get_env_var("HOME");
+    if (home.empty()) {
+        std::cerr << uid << " [ERROR] HOME environment variable not set!" << std::endl;
+        exit(EXIT_FAILURE);
+    }
+    ensure_config(home);
+    std::optional<configuration> user_config = get_config(home);
+    if (!user_config.has_value()) {
+        std::cerr << uid << " [ERROR] User's configuration was not valid! Giving them an empty one!";
+        user_config = {};
+    }
 
     // Run the dinit process
-    execl("/usr/bin/dinit", "--user", (void*)NULL);
-    //execl("/bin/sh", "sh", "-l", "-c", "dinit --user --services-dir /etc/dinit.d/user", (char*)NULL);
-    std::cerr << struid << " [ERROR] Somehow made it past the dinit excel!" << std::endl;
-    exit(EXIT_FAILURE); // if we somehow make it past the execl
+    std::string program = "/usr/bin/dinit";
+    std::vector<char*> argv;
+
+    argv.push_back(const_cast<char*>(program.c_str())); // First arg must be prgoram name
+    for (auto& arg : user_config.value().arguments) {
+        argv.push_back(const_cast<char*>(arg.c_str()));
+        //std::cout << uid << "[LOG] Added dinit arg: " << arg << std::endl;
+    }
+    argv.push_back(nullptr); // Null-terminate argv
+
+    execv(program.c_str(), argv.data());
+    perror("Execv failed!");
+    //execl("/usr/bin/dinit", "--user", (void*)NULL);
+    exit(EXIT_FAILURE); // if we somehow make it past the execv
 }
 
 // Get the integer from a UID string, if it fails, then nullopt instead

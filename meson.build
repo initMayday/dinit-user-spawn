@@ -2,9 +2,9 @@ project('dinit-user-spawn', 'cpp', version: '0.1', default_options: ['cpp_std=c+
 
 executable(
   'dinit-user-spawn',
-  ['main.cpp'],
+  ['main.cpp', 'config.cpp'],
   include_directories: include_directories('.'),
-  dependencies: [dependency('pam')],
+  dependencies: [dependency('tomlplusplus')],
   cpp_args: [],
   install: true,
 )

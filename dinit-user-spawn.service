@@ -1,0 +1,4 @@
+type = process
+command = /usr/bin/dinit-user-spawn
+depends-on = login.target
+restart = true
