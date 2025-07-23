@@ -1,4 +1,4 @@
-// Copyright (C) 2025 initMayday. This is available under GPLv3-or-later. See LICENSE.md
+// Copyright (C) 2025 initMayday (initMayday@protonmail.com). This is available under AGPLv3-or-later. See LICENSE
 
 #include <cstdlib>
 #include <cstring>
