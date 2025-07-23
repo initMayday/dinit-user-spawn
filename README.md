@@ -4,6 +4,12 @@ Dinit-user-spawn spawns a dinit process for each user that logs onto the system,
 
 Upon user logout, the user dinit process is cleaned up. This is the entire scope of the program.
 
+## Installation
+Choose your ideal package, and then run dinitctl enable dinit-user-spawn to enable the program. The included service file can be seen by inspecting dinit-user-spawn.service.
+
+**Dev Branch**:  
+[Arch User Repository](https://aur.archlinux.org/packages/dinit-user-spawn-dev-git)
+
 ## The logic behind the program
 The program finds logged-in users by monitoring /run/user/, where a directory (with the name of the user's UID), will be created when they log in. For example, for most people, when they log onto their main account a new folder "1000" (their user's UID), will be created in /run/user/.
 
