@@ -20,6 +20,9 @@ Upon user logout, dinit-user-spawn kills the associated dinit process (by lookin
 ## Configuration
 Find all configuration options within config.h, where there is an example toml demonstrating everything. It is called example_toml.
 
+## Important Notes
+dinit-user-spawn will not start another dinit instance for your user if you are already running one (via another method).
+
 ## Misc
 Please report any issues under the github issues. If there are any feature requests, you can also post them there, however, the scope of this program is limited to what is mentioned above. Alternatively, I can often be found on the artix telegram, so feel free to ask there.
 
