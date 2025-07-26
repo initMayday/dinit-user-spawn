@@ -6,6 +6,7 @@
 #include <fstream>
 #include <string>
 #include <toml++/toml.hpp>
+#include "configuration_example.h"
 
 bool ensure_path(std::filesystem::path path) {
  if (!std::filesystem::exists(path)) {

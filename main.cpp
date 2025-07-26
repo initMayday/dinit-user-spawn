@@ -167,20 +167,19 @@ void handle_user(int uid) {
 
     // Run the dinit process
     std::string program = "/usr/bin/dinit";
-    std::vector<char*> argv;
+    std::vector<char*> dinit_args;
 
-    argv.push_back(const_cast<char*>(program.c_str())); // First arg must be prgoram name
+    dinit_args.push_back(const_cast<char*>(program.c_str())); // First arg must be program name
     for (auto& arg : user_config.value().arguments) {
-        argv.push_back(const_cast<char*>(arg.c_str()));
+        dinit_args.push_back(const_cast<char*>(arg.c_str()));
         if (user_config->verbose_debug) {
             std::cout << uid << "[LOG] Added dinit arg: " << arg << std::endl;
         }
     }
-    argv.push_back(nullptr); // Null-terminate argv
+    dinit_args.push_back(nullptr); // Null-terminate args
 
-    execv(program.c_str(), argv.data());
-    perror("Execv failed!");
-    //execl("/usr/bin/dinit", "--user", (void*)NULL);
+    execv(program.c_str(), dinit_args.data());
+    perror("[ERROR] Execv failed!");
     exit(EXIT_FAILURE); // if we somehow make it past the execv
 }
 
