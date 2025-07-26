@@ -17,8 +17,8 @@ For each of these users, dinit-user-spawn creates a new dinit process that is ra
 
 Upon user logout, dinit-user-spawn kills the associated dinit process (by looking it up in the dictionary), and then handles the cleanup.
 
-## Configuration
-Find all configuration options within config.h, where there is an example toml demonstrating everything. It is called example_toml.
+## Documentation / Configuration
+Find all configuration options within [configuration_example](configuration_example.h), where there is an example toml demonstrating everything. You can also find the same toml as your default configuration, which you can find at ~/.config/dinit.d/config/dinit-user-spawn.toml.
 
 ## Important Notes
 dinit-user-spawn will not start another dinit instance for your user if you are already running one (via another method).
