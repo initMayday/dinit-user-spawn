@@ -29,12 +29,16 @@ std::string get_env_var(const std::string& var) {
 }
 
 // MUST RUN AS ROOT, GETS ENV VARS FOR SPECIFIED USER
-std::unordered_map<std::string, std::string> get_env_vars(passwd* pw) {
+std::unordered_map<std::string, std::string> get_env_vars(passwd* pw, bool minimal_environment_handling) {
     std::unordered_map<std::string, std::string> env_vars;
     env_vars.insert({"XDG_RUNTIME_DIR", std::string("/run/user/" + std::to_string(pw->pw_uid))}); // Arbitrary env var we need
 
+    if (minimal_environment_handling) {
+        std::cout << "[LOG] Minimal environment handling set, returning early" << std::endl;;
+        return env_vars;
+    }
+
     std::string command = "su - " + std::string(pw->pw_name) + " -c 'env'";
-    //std::cout << "COMMAND: " << command << std::endl;
     std::array<char, 4096> buffer;
     std::string result;
 
@@ -98,8 +102,6 @@ void handle_user(int uid) {
         return;
     }
 
-    std::unordered_map<std::string, std::string> env_vars = get_env_vars(pw);
-
     // UID is valid
     pid_t pid = fork(); // Returns 0 to child process, returns child's PID to parent process
     std::string process_id = std::to_string(getpid());
@@ -118,6 +120,19 @@ void handle_user(int uid) {
     
     // Clear the old environment, to avoid conflicting variables
     clearenv();
+
+    // This is something that needs the upmost scrutiny - the program is still root here yet we parse their configuration.
+    // Since we do not act on user input directly until we drop privileges this is fine, but still be very wary when extending this.
+    std::string home = pw->pw_dir; // The home directory
+    ensure_config(home);
+    std::optional<configuration> user_config = get_config(home);
+    if (!user_config.has_value()) {
+        std::cerr << uid << " [ERROR] User's configuration was not valid! Giving them an empty one!";
+        user_config = {};
+    }
+
+    // Get environment variables, still as root
+    std::unordered_map<std::string, std::string> env_vars = get_env_vars(pw, user_config->minimum_environment_handling);
 
     // Swap to the user
     if (initgroups(pw->pw_name, pw->pw_gid) != 0) {
@@ -146,18 +161,8 @@ void handle_user(int uid) {
         setenv(pair.first.c_str(), pair.second.c_str(), 0); // Don't overwrite existing env vars
     }
 
-    //system("env"); // Prints current environment vars
-
-    std::string home = get_env_var("HOME");
-    if (home.empty()) {
-        std::cerr << uid << " [ERROR] HOME environment variable not set!" << std::endl;
-        exit(EXIT_FAILURE);
-    }
-    ensure_config(home);
-    std::optional<configuration> user_config = get_config(home);
-    if (!user_config.has_value()) {
-        std::cerr << uid << " [ERROR] User's configuration was not valid! Giving them an empty one!";
-        user_config = {};
+    if (user_config->verbose_debug) {
+        system("env"); // Prints current environment vars
     }
 
     // Run the dinit process
@@ -167,7 +172,9 @@ void handle_user(int uid) {
     argv.push_back(const_cast<char*>(program.c_str())); // First arg must be prgoram name
     for (auto& arg : user_config.value().arguments) {
         argv.push_back(const_cast<char*>(arg.c_str()));
-        //std::cout << uid << "[LOG] Added dinit arg: " << arg << std::endl;
+        if (user_config->verbose_debug) {
+            std::cout << uid << "[LOG] Added dinit arg: " << arg << std::endl;
+        }
     }
     argv.push_back(nullptr); // Null-terminate argv
 
