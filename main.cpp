@@ -1,5 +1,6 @@
 // Copyright (C) 2025 initMayday (initMayday@protonmail.com). This is available under AGPLv3-or-later. See LICENSE
 
+#include <chrono>
 #include <cstdlib>
 #include <cstring>
 #include <filesystem>
@@ -7,6 +8,7 @@
 #include <map>
 #include <optional>
 #include <string>
+#include <thread>
 #include <unordered_map>
 #include <vector>
 #include <sys/inotify.h>
@@ -213,6 +215,18 @@ int main() {
         perror("[ERROR] sigaction failed");
         exit(EXIT_FAILURE);
     }
+
+    // Stall the program until /run/users exists
+    bool print_once = false;
+    while (!std::filesystem::exists(monitored_path)) {
+        if (print_once == false) {
+            std::cout << "[LOG] Stalling until " << monitored_path.string() << " exists!" << std::endl;
+            print_once = true;
+        }
+        std::this_thread::sleep_for(std::chrono::milliseconds(100)); // sleep 100 millisecodns
+    }
+    std::cout << "[LOG] Monitored path: " << monitored_path.string() << " exists, continuing!" << std::endl;
+
     
     // Incase we are started after some users have already logged in (should not occur in normal scenarios)
     std::vector<int> queued_users;
