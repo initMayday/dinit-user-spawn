@@ -37,6 +37,44 @@ bool ensure_file(std::filesystem::path path, std::string content) {
     return true;
 }
 
+bool check_path(std::filesystem::path path) {
+    if (std::filesystem::exists(path)) {
+        return true;
+    }
+    std::cout << "[LOG] Path did not exist: " << path.string() << std::endl;
+    return false;
+}
+
+bool check_file(std::filesystem::path path) {
+    if (std::filesystem::exists(path)) {
+        return true;
+    }
+    std::cout << "[LOG] File did not exist: " << path.string() << std::endl;
+    return false;
+}
+
+bool check_config_exists(std::string home) {
+    std::filesystem::path dinitd_path = home + dinitd_dir;
+    std::filesystem::path config_path = home + config_dir;
+    
+    std::filesystem::path boot_dir = dinitd_path / "boot";
+    std::filesystem::path boot_d_dir = dinitd_path / "boot.d";
+    std::filesystem::path spawn_dir = config_path / "dinit-user-spawn.toml";
+
+    // Ensure the directories actually exist
+    if (check_path(dinitd_path) == false) { return false; }
+    if (check_path(config_path) == false) { return false; }
+
+    // Technically, it would be beneficial to also check if it is a directory / file, but
+    // that should never occur granted they haven't messed around to largely intentionally cause this
+    if (check_file(boot_dir) == false) { return false; }
+
+    if (check_path(boot_d_dir) == false) { return false; }
+    if (check_file(spawn_dir) == false) { return false; }
+
+    return true;
+}
+
 bool ensure_config(std::string home) {
     std::filesystem::path dinitd_path = home + dinitd_dir;
     std::filesystem::path config_path = home + config_dir;

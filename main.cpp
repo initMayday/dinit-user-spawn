@@ -124,11 +124,20 @@ void handle_user(int uid) {
     // This is something that needs the upmost scrutiny - the program is still root here yet we parse their configuration.
     // Since we do not act on user input directly until we drop privileges this is fine, but still be very wary when extending this.
     std::string home = pw->pw_dir; // The home directory
-    ensure_config(home);
-    std::optional<configuration> user_config = get_config(home);
-    if (!user_config.has_value()) {
-        std::cerr << uid << " [ERROR] User's configuration was not valid! Giving them an empty one!";
-        user_config = {};
+    bool config_exists = check_config_exists(home);
+    std::optional<configuration> user_config;
+
+    if (config_exists) {
+        user_config = get_config(home);
+        if (!user_config.has_value()) {
+            // Their config had errors in it, give them a new one
+            std::cerr << uid << " [ERROR] User's configuration was not valid! Giving them an empty one!" << std::endl;
+            user_config = configuration {};
+        }
+    } else {
+        // Their config never existed, we'll give them a new one
+        std::cout << uid << " [LOG] User's configuration path did not exist! Some paths or files did not exist! Giving them an empty config!" << std::endl;
+        user_config = configuration {};
     }
 
     // Get environment variables, still as root
@@ -155,6 +164,14 @@ void handle_user(int uid) {
     }
 
     std::cout << process_id << " [LOG] Running as: " << getpwuid(getuid())->pw_name << std::endl;
+
+    // We create the config, as the user to ensure it has correct permissions!
+    if (!config_exists) {
+        std::cout << uid << "[LOG] We previously determined the user's configuration path was not fully enstated, therefore we now regenerate any missing pieces!" << std::endl;
+        if (ensure_config(home) == false) {
+            std::cerr << uid << "[ERROR] Failed to create / regenerate the configuration directory!" << std::endl;
+        }
+    }
 
     // Set new environment
     for (const auto& pair: env_vars) {

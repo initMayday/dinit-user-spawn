@@ -20,4 +20,5 @@ struct configuration {
 };
 
 bool ensure_config(std::string home);
+bool check_config_exists(std::string home);
 std::optional<configuration> get_config(std::string home);
