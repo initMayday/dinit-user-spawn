@@ -7,7 +7,12 @@ Upon user logout, the user dinit process is cleaned up. This is the entire scope
 ## Installation
 Choose your ideal package, and then run dinitctl enable dinit-user-spawn to enable the program. The included service file can be seen by inspecting dinit-user-spawn.service.
 
-**Dev Branch**:  
+*The master branch is the stable branch, and is intended for use by end users. The dev branch is only intended for testing, and thus may break. Hence, you should (unless you otherwise know what you are doing) use the master branch. The master branch is periodically synced to the dev branch, when it is believed to be stable.*
+
+**Master Branch (Stable)**:  
+[Arch User Repository](https://aur.archlinux.org/packages/dinit-user-spawn-master-git)
+
+**Dev Branch (Testing)**:  
 [Arch User Repository](https://aur.archlinux.org/packages/dinit-user-spawn-dev-git)
 
 ## The logic behind the program
