@@ -1,8 +1,8 @@
 # Maintainer: initMayday <initMayday@protonmail.com>
-# GIT DEV branch package
+# GIT MASTER branch package (ie. stable)
 
 _pkgname="dinit-user-spawn"
-pkgname="$_pkgname-dev-git"
+pkgname="$_pkgname-master-git"
 pkgrel=1
 pkgver=r21.b09ae6e
 pkgdesc='Launches a user process dinit for you on login'
@@ -13,7 +13,7 @@ depends=('tomlplusplus')
 provides=("$_pkgname")
 conflicts=("$_pkgname")
 license=('AGPL-3.0-or-later')
-source=("$_pkgname::git+$url#branch=dev")
+source=("$_pkgname::git+$url#branch=master")
 sha256sums=('SKIP')
 builddir='build-release'
 install='dinit-user-spawn.install'
