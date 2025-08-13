@@ -15,7 +15,7 @@ waits-for.d: ./boot.d/
 
 struct configuration {
     std::vector<std::string> arguments;
-    bool minimum_environment_handling = false;
+    bool minimal_environment_handling = false;
     bool verbose_debug = false;
 };
 

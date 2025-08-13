@@ -103,6 +103,21 @@ void did_parse(bool parsed, std::string arg_name) {
     }
 }
 
+void parse_boolean(std::shared_ptr<toml::table> config, bool& target_bool, std::string arg_name) {
+    bool parsed = false;
+    auto min_env = config->get(arg_name);
+    if (min_env) {
+        if (min_env->is_boolean()) {
+            auto opt = min_env->as_boolean();
+            parsed = true;
+            target_bool = opt->get();
+        } else {
+            std::cerr << "[ERROR] Value of " << arg_name << " was not a bool" << std::endl;
+        }
+    }
+    did_parse(parsed, arg_name);
+}
+
 std::optional<configuration> get_config(std::string home) {
     std::filesystem::path config_path = home + config_dir;
     std::filesystem::path spawn_dir = config_path / "dinit-user-spawn.toml";
@@ -135,31 +150,8 @@ std::optional<configuration> get_config(std::string home) {
     did_parse(parsed, "dinit_arguments");
     parsed = false;
 
-    auto min_env = config->get("minimal_environment_handling");
-    if (min_env) {
-        if (min_env->is_boolean()) {
-            auto opt = min_env->as_boolean();
-            parsed = true;
-            ret.minimum_environment_handling = opt->get();
-        } else {
-            std::cerr << "[ERROR] Arg in minimal_environment_handling was not a bool" << std::endl;
-        }
-    }
-    did_parse(parsed, "minimal_environment_handling");
-    parsed = false;
-
-    auto verbose_debug = config->get("verbose_debug");
-    if (verbose_debug) {
-        if (verbose_debug->is_boolean()) {
-            auto opt = verbose_debug->as_boolean();
-            parsed = true;
-            ret.verbose_debug = opt->get();
-        } else {
-            std::cerr << "[ERROR] Arg in verbose_debug was not a bool" << std::endl;
-        }
-    }
-    did_parse(parsed, "verbose_debug");
-    parsed = false;
+    parse_boolean(config, ret.minimal_environment_handling, "minimal_environment_handling");
+    parse_boolean(config, ret.verbose_debug, "verbose_debug");
 
     return ret;
 }

@@ -141,7 +141,7 @@ void handle_user(int uid) {
     }
 
     // Get environment variables, still as root
-    std::unordered_map<std::string, std::string> env_vars = get_env_vars(pw, user_config->minimum_environment_handling);
+    std::unordered_map<std::string, std::string> env_vars = get_env_vars(pw, user_config->minimal_environment_handling);
 
     // Swap to the user
     if (initgroups(pw->pw_name, pw->pw_gid) != 0) {
@@ -216,7 +216,11 @@ void reap_child(int sig) {
     int status;
     pid_t pid;
     while ((pid = waitpid(-1, &status, WNOHANG)) > 0) {
-        std::cout << "[LOG] Reaped child PID: " << pid << std::endl;
+
+        // Use write rather than cout to avoid potential issues
+        char buffer[64];
+        int len = snprintf(buffer, sizeof(buffer), "[LOG] Reaped child PID: %d\n", (int)pid);
+        write(STDOUT_FILENO, buffer, len);
     }
 }
 
