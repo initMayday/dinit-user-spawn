@@ -10,10 +10,11 @@ Choose your ideal package, and then run dinitctl enable dinit-user-spawn to enab
 *The master branch is the stable branch, and is intended for use by end users. The dev branch is only intended for testing, and thus may break. Hence, you should (unless you otherwise know what you are doing) use the master branch. The master branch is periodically synced to the dev branch, when it is believed to be stable.*
 
 **Master Branch (Stable)**:  
-[Arch User Repository](https://aur.archlinux.org/packages/dinit-user-spawn-master-git)
+[Arch User Repository](https://aur.archlinux.org/packages/dinit-user-spawn-master-git) (first-party)  
+[Artix System Repository](https://packages.artixlinux.org/packages/system/x86_64/dinit-user-spawn/) (third-party)
 
 **Dev Branch (Testing)**:  
-[Arch User Repository](https://aur.archlinux.org/packages/dinit-user-spawn-dev-git)
+[Arch User Repository](https://aur.archlinux.org/packages/dinit-user-spawn-dev-git) (first-party)
 
 ## The logic behind the program
 The program finds logged-in users by monitoring /run/user/, where a directory (with the name of the user's UID), will be created when they log in. For example, for most people, when they log onto their main account a new folder "1000" (their user's UID), will be created in /run/user/.
