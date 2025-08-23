@@ -11,6 +11,7 @@
 #include <thread>
 #include <unordered_map>
 #include <vector>
+#include <array>
 #include <sys/inotify.h>
 #include <unistd.h>
 #include <pwd.h>
@@ -182,8 +183,8 @@ void handle_user(int uid) {
         system("env"); // Prints current environment vars
     }
 
-    // Run the dinit process
-    std::string program = "/usr/bin/dinit";
+    // Run the dinit process, using the user's specified binary
+    std::string program = user_config->binary;
     std::vector<char*> dinit_args;
 
     dinit_args.push_back(const_cast<char*>(program.c_str())); // First arg must be program name

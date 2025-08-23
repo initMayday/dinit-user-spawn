@@ -132,8 +132,22 @@ std::optional<configuration> get_config(std::string home) {
         return std::nullopt;
     }
 
-    auto dinit_args = config->get("dinit_arguments");
     bool parsed = false;
+    
+    auto binary = config->get("binary");
+    if (binary) {
+        if (binary->is_string()) {
+            auto opt = binary->as_string();
+            parsed = true;
+            ret.binary = opt->get();
+        } else {
+            std::cerr << "[ERROR] Value of binary was not a string" << std::endl;
+        }
+    }
+    did_parse(parsed, "binary");
+    parsed = false;
+
+    auto dinit_args = config->get("dinit_arguments");
     if (dinit_args) {
         if (dinit_args->is_array()) {
             auto array = dinit_args->as_array();
