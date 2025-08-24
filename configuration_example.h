@@ -15,12 +15,8 @@ binary = "/usr/bin/dinit"
 # Add arguments one by one, for example ["--user", "--services-dir", "/home/myuser/.config/dinit.d"].
 dinit_arguments = ["--user"] 
 
-# Disables running the 'env' command, to get your other environment variables (of which it will transfer to the new dinit process).
-# This means that only your XDG_RUNTIME_DIR will be set, the minimum required for the dinit child processes to run correctly.
-# XDG_RUNTIME_DIR is not set by looking at the 'env' commands output, but manually constructed so it is a steady fallback.
-# Set to true by default to prevent potential issues with the env command.
-minimal_environment_handling = true
-
 # Enables verbose debugging options. It will flood logs, in catlog.
 verbose_debug = false
+
+# There used to be a minimal_environment_handling variable, but this was removed and now is always enabled. This is because the previous method of trying to 'inherit' environment variables, didn't actually inherit many useful env vars. Therefore, if you are not doing what will be latter metioned, ensure your services do no depend on env vars beyond (SHELL, PWD, LOGNAME, HOME, SHLVL, XDG_RUNTIME_DIR, and PATH)  For those seeking to set environment variables, please use dinit_arguments to specify an environment file, or utilise the environment file option in dinit services.
 )";

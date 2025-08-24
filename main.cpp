@@ -11,7 +11,6 @@
 #include <thread>
 #include <unordered_map>
 #include <vector>
-#include <array>
 #include <sys/inotify.h>
 #include <unistd.h>
 #include <pwd.h>
@@ -30,50 +29,14 @@ std::string get_env_var(const std::string& var) {
 }
 
 // MUST RUN AS ROOT, GETS ENV VARS FOR SPECIFIED USER
-std::unordered_map<std::string, std::string> get_env_vars(passwd* pw, bool minimal_environment_handling) {
+std::unordered_map<std::string, std::string> get_env_vars(passwd* pw) {
     std::unordered_map<std::string, std::string> env_vars;
     env_vars.insert({"XDG_RUNTIME_DIR", std::string("/run/user/" + std::to_string(pw->pw_uid))}); // Arbitrary env var we need
+    env_vars.insert({"PATH", "/usr/bin/"}); // Arbitrary, but most people will probably use this. Potentially remove in future.
+    env_vars.insert({"SHELL", pw->pw_shell});
+    env_vars.insert({"HOME", pw->pw_dir});
+    env_vars.insert({"LOGNAME", pw->pw_name});
 
-    if (minimal_environment_handling) {
-        std::cout << "[LOG] Minimal environment handling set, returning early" << std::endl;;
-        return env_vars;
-    }
-
-    std::string command = "su - " + std::string(pw->pw_name) + " -c 'env'";
-    std::array<char, 4096> buffer;
-    std::string result;
-
-    FILE* pipe = popen(command.c_str(), "r");
-    if (!pipe) {
-        std::cerr << "Couldn't start command." << std::endl;
-        return env_vars;
-    }
-
-    while (fgets(buffer.data(), buffer.size(), pipe) != NULL) {
-        result += buffer.data();
-    }
-
-    int return_code = pclose(pipe);
-    if (return_code == -1) {
-        // If pclose fails with "no child processes", this is expected behaviour, as our reap_child function handles it before
-        // pclose can, and therefore, pclose is unable to. This log is kept here, incase pclose fails for a real reason.
-        perror("[WARNING] Pclose failed, but this is likely because we reaped the process before it could, so it is a non-issue");
-    } else if (return_code != 0) {
-        // ERROR OCCURED! This should satisfice, but unideal.
-        std::cerr << "[ERROR] Failed to get env vars for: " << pw->pw_name << std::endl;
-        return env_vars;
-    }
-
-    std::istringstream iss(result);
-    std::string line;
-    while (std::getline(iss, line)) {  // getline() removes the \n
-        size_t pos = line.find('=');
-        if (pos != std::string::npos) {
-            std::string key = line.substr(0, pos);
-            std::string value = line.substr(pos + 1); // Go one past to skip the '='
-            env_vars.insert_or_assign(key, value);
-        }
-    }
     return env_vars;
 }
 
@@ -87,7 +50,8 @@ void handle_user(int uid) {
         return;
     }
 
-    // Confirm there is no dinit process running
+    // Confirm there is no dinit process running. Note this is hardcoded to dinit as the binary option is meant to simply 
+    // specify where the dinit binary is - not meant to be something beyond dinit.
     std::string command = "pgrep -x -u " + std::to_string(uid) + " dinit > /dev/null"; 
     int execute_success = system(command.c_str());
     if (execute_success == -1) {
@@ -142,7 +106,7 @@ void handle_user(int uid) {
     }
 
     // Get environment variables, still as root
-    std::unordered_map<std::string, std::string> env_vars = get_env_vars(pw, user_config->minimal_environment_handling);
+    std::unordered_map<std::string, std::string> env_vars = get_env_vars(pw);
 
     // Swap to the user
     if (initgroups(pw->pw_name, pw->pw_gid) != 0) {

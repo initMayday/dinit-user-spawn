@@ -16,7 +16,6 @@ waits-for.d: ./boot.d/
 struct configuration {
     std::string binary = "/usr/bin/dinit";
     std::vector<std::string> arguments;
-    bool minimal_environment_handling = false;
     bool verbose_debug = false;
 };
 

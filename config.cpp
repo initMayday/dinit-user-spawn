@@ -164,7 +164,6 @@ std::optional<configuration> get_config(std::string home) {
     did_parse(parsed, "dinit_arguments");
     parsed = false;
 
-    parse_boolean(config, ret.minimal_environment_handling, "minimal_environment_handling");
     parse_boolean(config, ret.verbose_debug, "verbose_debug");
 
     return ret;
