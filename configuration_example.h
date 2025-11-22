@@ -18,5 +18,5 @@ dinit_arguments = ["--user"]
 # Enables verbose debugging options. It will flood logs, in catlog.
 verbose_debug = false
 
-# There used to be a minimal_environment_handling variable, but this was removed and now is always enabled. This is because the previous method of trying to 'inherit' environment variables, didn't actually inherit many useful env vars. Therefore, if you are not doing what will be latter metioned, ensure your services do no depend on env vars beyond (SHELL, PWD, LOGNAME, HOME, SHLVL, XDG_RUNTIME_DIR, and PATH)  For those seeking to set environment variables, please use dinit_arguments to specify an environment file, or utilise the environment file option in dinit services.
+# There used to be a minimal_environment_handling variable, but this was removed and now is always enabled. This is because the previous method of trying to 'inherit' environment variables, didn't actually inherit many useful env vars. Therefore, if you are not doing what will be latter metioned, ensure your services do not depend on env vars beyond (SHELL, PWD, LOGNAME, HOME, SHLVL, XDG_RUNTIME_DIR, and PATH)  For those seeking to set environment variables, please use dinit_arguments to specify an environment file, or utilise the environment file option in dinit services.
 )";

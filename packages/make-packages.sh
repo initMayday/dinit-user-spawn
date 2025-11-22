@@ -6,7 +6,7 @@ set -euo pipefail
 #> Ensure correct working directory
 cd "$(dirname "${BASH_SOURCE[0]}")"
 
-branches=("dev" "master")
+branches=("dev")
 
 for branch in "${branches[@]}"; do
     if [[ "$branch" == "template" ]]; then
