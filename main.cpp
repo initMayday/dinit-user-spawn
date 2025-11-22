@@ -33,7 +33,7 @@ std::unordered_map<std::string, std::string> get_env_vars(passwd* pw) {
     std::unordered_map<std::string, std::string> env_vars;
     std::string run_dir = std::string("/run/user/" + std::to_string(pw->pw_uid));
     env_vars.insert({"XDG_RUNTIME_DIR", run_dir}); // Arbitrary env var we need
-    env_vars.insert({"PATH", "/usr/bin:/usr/local/bin:/usr/local/sbin"}); // Arbitrary, but most people will probably use this.
+    env_vars.insert({"PATH", "/usr/local/sbin:/usr/local/bin:/usr/bin"}); // Arbitrary, but most people will probably use this.
     // In future, migrate to sourcing /etc/profile - it specifies the PATH exactly
     env_vars.insert({"SHELL", pw->pw_shell});
     env_vars.insert({"HOME", pw->pw_dir});
