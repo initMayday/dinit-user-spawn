@@ -189,6 +189,13 @@ void reap_child(int sig) {
         char buffer[64];
         int len = snprintf(buffer, sizeof(buffer), "[LOG] Reaped child PID: %d\n", (int)pid);
         write(STDOUT_FILENO, buffer, len);
+        // Prune map so stale PIDs don't linger if dinit exited before logout
+        for (auto it = uid_pid_map.begin(); it != uid_pid_map.end(); ++it) {
+            if (it->second == pid) {
+                uid_pid_map.erase(it);
+                break;
+            }
+        }
     }
 }
 
@@ -289,8 +296,10 @@ int main() {
                     if (event->mask & IN_CREATE) {
                         handle_user(parsed_name.value());
                     } else if (event->mask & IN_DELETE) {
-                        if (uid_pid_map.find(parsed_name.value()) != uid_pid_map.end()) {
-                            kill(uid_pid_map.at(parsed_name.value()), SIGTERM);
+                        auto it = uid_pid_map.find(parsed_name.value());
+                        if (it != uid_pid_map.end()) {
+                            kill(it->second, SIGTERM);
+                            uid_pid_map.erase(it);
                             std::cout << "[LOG] Cleaning up UID: " << parsed_name.value() << std::endl;
                         } else {
                             std::cerr << "[ERROR] Tried to clean up after UID: " << parsed_name.value() << " but failed to find matching PID!" << std::endl; 
