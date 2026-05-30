@@ -1,3 +1,7 @@
+> [!WARNING]
+> Superseded entirely by: https://github.com/Mayware/userspawn, compatible with multiple init systems.  
+> Please use this instead.
+
 # dinit-user-spawn
 
 Dinit-user-spawn spawns a dinit process for each user that logs onto the system, automagically. This is useful by, for example, allowing each user to run their own pipewire processes under their own user.
